@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>🏞️ SMC AI · Trade Park (Album)</title>
+    <style>
+        /* ───────────── RESET & BASE ───────────── */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0b1119;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            color: #d0dcec;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+        .dashboard {
+            max-width: 1600px;
+            width: 100%;
+        }
+
+        /* ───────────── GLASS / THEME ───────────── */
+        .glass {
+            background: rgba(20, 30, 44, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            padding: 16px 20px;
+        }
+
+        /* ───────────── HEADER ───────────── */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding: 16px 24px;
+        }
+        .header-left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4fc3f7, #b388ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .logo span { font-weight: 300; -webkit-text-fill-color: #78909c; }
+        .badge {
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .badge-green { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0,230,118,0.2); }
+        .badge-red { background: rgba(255, 82, 82, 0.15); color: #ff5252; border: 1px solid rgba(255,82,82,0.2); }
+        .badge-gold { background: rgba(255, 193, 7, 0.15); color: #ffd54f; border: 1px solid rgba(255,193,7,0.2); }
+        .badge-blue { background: rgba(0, 180, 255, 0.12); color: #4fc3f7; border: 1px solid rgba(0,180,255,0.2); }
+        .header-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .time { font-size: 0.75rem; color: #78909c; font-weight: 500; }
+        .status-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: #00e676; box-shadow: 0 0 16px rgba(0,230,118,0.4);
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+        .btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #b0bec5;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn:hover { background: rgba(255,255,255,0.12); color: #e0e8f0; }
+        .btn:active { transform: scale(0.96); }
+
+        /* ───────────── ALBUM GRID ───────────── */
+        .album-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+        .album-grid .card {
+            background: rgba(16, 26, 38, 0.7);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 18px;
+            padding: 16px 18px;
+            transition: border-color 0.2s;
+        }
+        .album-grid .card:hover { border-color: rgba(255,255,255,0.12); }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .card-header h3 {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #78909c;
+            font-weight: 600;
+        }
+        .card-header .chip {
+            font-size: 0.55rem;
+            background: rgba(255,255,255,0.04);
+            padding: 2px 12px;
+            border-radius: 30px;
+            color: #90a4ae;
+        }
+
+        /* ───────────── ALERT SCROLL ───────────── */
+        .alert-scroll {
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .alert-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            font-size: 0.7rem;
+            line-height: 1.5;
+        }
+        .alert-item .time { color: #546e7a; font-size: 0.6rem; white-space: nowrap; padding-top: 1px; }
+        .alert-item .msg { color: #b0bec5; flex:1; }
+        .tag {
+            font-size: 0.5rem;
+            font-weight: 600;
+            padding: 1px 8px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.04);
+            color: #78909c;
+            white-space: nowrap;
+        }
+        .tag-tape { background: rgba(255,193,7,0.12); color: #ffd54f; }
+        .tag-cvd { background: rgba(0,180,255,0.12); color: #4fc3f7; }
+        .tag-info { background: rgba(100,200,255,0.08); color: #81d4fa; }
+
+        /* ───────────── METRIC TILES ───────────── */
+        .metric-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            margin-top: 4px;
+        }
+        .metric {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .metric .label { font-size: 0.55rem; text-transform: uppercase; color: #546e7a; letter-spacing: 0.05em; }
+        .metric .value { font-size: 1.2rem; font-weight: 600; color: #e8edf3; }
+        .metric .value.green { color: #00e676; }
+        .metric .value.red { color: #ff5252; }
+        .metric .value.gold { color: #ffd54f; }
+        .metric .value.blue { color: #4fc3f7; }
+        .metric .sub { font-size: 0.55rem; color: #78909c; }
+
+        /* ───────────── TABLE (Setups) ───────────── */
+        .setup-table {
+            width: 100%;
+            font-size: 0.65rem;
+            border-collapse: collapse;
+        }
+        .setup-table th {
+            text-align: left;
+            color: #546e7a;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.5rem;
+            letter-spacing: 0.06em;
+            padding: 4px 4px 8px 4px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .setup-table td {
+            padding: 5px 4px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            color: #b0bec5;
+        }
+        .setup-table tr:last-child td { border-bottom: 0; }
+        .setup-table .coin { font-weight: 600; color: #e8edf3; }
+        .direction-bull { color: #00e676; }
+        .direction-bear { color: #ff5252; }
+        .rr-badge {
+            background: rgba(255,255,255,0.04);
+            padding: 1px 8px;
+            border-radius: 20px;
+            font-size: 0.55rem;
+            color: #90a4ae;
+        }
+
+        /* ───────────── SPARKLINE (simple bar) ───────────── */
+        .spark {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 30px;
+            margin: 4px 0;
+        }
+        .spark .bar {
+            flex: 1;
+            background: linear-gradient(180deg, #4fc3f7, #1a2a3a);
+            border-radius: 2px 2px 0 0;
+            min-height: 4px;
+            transition: height 0.5s ease;
+        }
+        .spark .bar.green { background: linear-gradient(180deg, #00e676, #1a3a2a); }
+        .spark .bar.red { background: linear-gradient(180deg, #ff5252, #3a1a1a); }
+
+        /* ───────────── PORTFOLIO GRID ───────────── */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .port-item { text-align: center; padding: 6px 0; }
+        .port-item .num { font-size: 1rem; font-weight: 600; color: #e8edf3; }
+        .port-item .lbl { font-size: 0.5rem; text-transform: uppercase; color: #546e7a; letter-spacing: 0.04em; }
+
+        /* ───────────── STATUS BAR ───────────── */
+        .status-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            margin-top: 18px;
+            background: rgba(12, 20, 30, 0.7);
+            backdrop-filter: blur(4px);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.7rem;
+        }
+        .status-bar .left { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+        .dot-green { background: #00e676; }
+        .dot-gold { background: #ffd54f; }
+        .status-bar .right { color: #546e7a; font-size: 0.6rem; }
+
+        /* ───────────── RESPONSIVE ───────────── */
+        @media (max-width: 640px) {
+            .album-grid { grid-template-columns: 1fr; }
+            .portfolio-grid { grid-template-columns: 1fr 1fr; }
+            .header { flex-direction: column; align-items: stretch; gap: 12px; }
+            .header-right { justify-content: space-between; }
+        }
+        /* scanning animation */
+        .scanning .card { opacity: 0.6; transition: opacity 0.3s; }
+        .scanning .card:nth-child(1) { opacity: 1; }
+        .scanning .card:nth-child(2) { opacity: 0.9; }
+        .scanning .card:nth-child(3) { opacity: 0.8; }
+
+        /* ───────────── SCAN GRID (full list) ───────────── */
+        .scan-grid-full {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            max-height: 260px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .scan-grid-full .scan-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 6px;
+            background: rgba(0,0,0,0.15);
+            border-radius: 4px;
+            font-size: 0.6rem;
+            align-items: center;
+        }
+        .scan-grid-full .scan-item .sym { font-weight: 500; color: #b0bec5; }
+        .scan-grid-full .scan-item .dir { font-weight: 600; font-size: 0.55rem; }
+
+        @media (max-width: 640px) {
+            .scan-grid-full { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard">
+
+    <!-- ═══════════ HEADER ═══════════ -->
+    <header class="header glass">
+        <div class="header-left">
+            <div class="logo">🏞️ SMC AI <span>· Trade Park</span></div>
+            <span class="badge badge-green">● LIVE</span>
+            <span class="badge badge-blue">⚡ REAL CVD</span>
+        </div>
+        <div class="header-right">
+            <span class="time" id="clock">⏱️ 02:22:17 UTC</span>
+            <div class="status-dot"></div>
+            <button class="btn" id="forceScanBtn">⟳ FORCE SCAN</button>
+            <button class="btn" id="resetBtn">🗑️ RESET</button>
+        </div>
+    </header>
+
+    <!-- ═══════════ ALBUM GRID ═══════════ -->
+    <div class="album-grid" id="albumGrid">
+
+        <!-- CARD: Tape Speed Alerts -->
+        <div class="card">
+            <div class="card-header">
+                <h3>🔊 TAPE SPEED ALERTS</h3>
+                <span class="chip">● ACTIVE</span>
+            </div>
+            <div class="alert-scroll" id="tapeAlerts">
+                <!-- dynamically filled -->
+            </div>
+            <div class="metric-row" style="margin-top:8px;">
+                <div class="metric"><span class="label">Latest</span><span class="value gold" id="latestTape">252.4x</span><span class="sub" id="latestTime">23:45:30</span></div>
+                <div class="metric"><span class="label">High</span><span class="value red" id="highTape">196.8x</span></div>
+                <div class="metric"><span class="label">Low</span><span class="value blue" id="lowTape">4.2x</span></div>
+                <div class="metric"><span class="label">Avg (15m)</span><span class="value" style="color:#b0bec5;" id="avgTape">87.3x</span></div>
+            </div>
+            <div style="font-size:0.6rem;color:#78909c;margin-top:4px;">⚠️ <span id="volatilityMsg">Expect volatility expansion in next 15–30 min</span></div>
+        </div>
+
+        <!-- CARD: Signal Alerts (CVD) -->
+        <div class="card">
+            <div class="card-header">
+                <h3>📢 SIGNAL &amp; EXECUTION</h3>
+                <span class="chip">● LIVE</span>
+            </div>
+            <div class="alert-scroll" id="signalAlerts">
+                <!-- dynamically filled -->
+            </div>
+        </div>
+
+        <!-- CARD: Bullish Park -->
+        <div class="card">
+            <div class="card-header">
+                <h3>🟢 BULLISH PARK · LONG</h3>
+                <span class="badge badge-green">5 setups</span>
+            </div>
+            <table class="setup-table" id="bullishTable">
+                <thead><tr><th>Coin</th><th>Entry</th><th>Target</th><th>RR</th><th>Signal</th></tr></thead>
+                <tbody id="bullishBody">
+                    <!-- dynamic -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- CARD: Bearish Park -->
+        <div class="card">
+            <div class="card-header">
+                <h3>🔴 BEARISH PARK · SHORT</h3>
+                <span class="badge badge-red">3 setups</span>
+            </div>
+            <table class="setup-table" id="bearishTable">
+                <thead><tr><th>Coin</th><th>Entry</th><th>Target</th><th>RR</th><th>Signal</th></tr></thead>
+                <tbody id="bearishBody">
+                    <!-- dynamic -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- CARD: Top 5 Strongest Setups -->
+        <div class="card">
+            <div class="card-header">
+                <h3>📊 TOP 5 STRONGEST SETUPS</h3>
+                <span class="chip">🧠 AI SCORED</span>
+            </div>
+            <div id="topSetups" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <!-- dynamic -->
+            </div>
+        </div>
+
+        <!-- CARD: Market Overview -->
+        <div class="card">
+            <div class="card-header">
+                <h3>📈 MARKET OVERVIEW</h3>
+                <span class="chip">● LIVE</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div class="metric"><span class="label">BTC Alpha</span><span class="value" style="color:#b0bec5;" id="btcAlpha">-0.02%</span><span class="sub" id="btcAlphaSub">Neutral</span></div>
+                <div class="metric"><span class="label">Market Regime</span><span class="value gold" id="marketRegime">NEUTRAL</span><span class="sub">Sideways</span></div>
+                <div class="metric"><span class="label">OI Flow</span><span class="value" style="color:#b0bec5;" id="oiFlow">0.00%</span><span class="sub">Flat</span></div>
+                <div class="metric"><span class="label">Funding Rate</span><span class="value" style="color:#b0bec5;" id="fundingRate">0.005%</span><span class="sub">Neutral</span></div>
+                <div class="metric"><span class="label">Volatility Δ</span><span class="value gold" id="volDelta">+17.78%</span><span class="sub">⚠️ Increasing</span></div>
+                <div class="metric"><span class="label">CVD (Real)</span><span class="value blue" id="cvdReal">22.54%</span><span class="sub">Bullish bias</span></div>
+            </div>
+            <div style="margin-top:10px;">
+                <div style="font-size:0.55rem;color:#546e7a;text-transform:uppercase;letter-spacing:0.05em;">BTC Price Trend (simulated)</div>
+                <div class="spark" id="btcSpark"></div>
+            </div>
+        </div>
+
+        <!-- CARD: Quick Scan Grid (FULL list) -->
+        <div class="card">
+            <div class="card-header">
+                <h3>⚡ QUICK SCAN · ALL COINS</h3>
+                <span class="chip" id="scanCoinCount">54 coins</span>
+            </div>
+            <div class="scan-grid-full" id="scanGridFull">
+                <!-- dynamically filled -->
+            </div>
+            <div style="margin-top:6px;font-size:0.55rem;color:#546e7a;text-align:right;" id="scanStats">↕ 54 active · 18 bullish · 14 bearish · 22 neutral</div>
+        </div>
+
+        <!-- CARD: Portfolio Status -->
+        <div class="card">
+            <div class="card-header">
+                <h3>💰 PORTFOLIO STATUS</h3>
+                <span class="chip">● LIVE</span>
+            </div>
+            <div class="portfolio-grid">
+                <div class="port-item"><div class="num" id="balance">$9,830.00</div><div class="lbl">Balance</div></div>
+                <div class="port-item"><div class="num" style="color:#b0bec5;" id="floatingPnl">+$0.00</div><div class="lbl">Floating PNL</div></div>
+                <div class="port-item"><div class="num" style="color:#b0bec5;" id="realizedPnl">+$0.00</div><div class="lbl">Realized PNL</div></div>
+                <div class="port-item"><div class="num" style="color:#b0bec5;" id="winRate">0%</div><div class="lbl">Win Rate</div></div>
+                <div class="port-item"><div class="num" style="color:#b0bec5;" id="totalTrades">0</div><div class="lbl">Total Trades</div></div>
+                <div class="port-item"><div class="num" style="color:#00e676;" id="wins">0</div><div class="lbl">Wins</div></div>
+                <div class="port-item"><div class="num" style="color:#ff5252;" id="losses">0</div><div class="lbl">Losses</div></div>
+                <div class="port-item"><div class="num" style="color:#b0bec5;" id="maxDrawdown">0.0%</div><div class="lbl">Max Drawdown</div></div>
+            </div>
+        </div>
+
+        <!-- CARD: Risk Management -->
+        <div class="card">
+            <div class="card-header">
+                <h3>🛑 RISK MANAGEMENT</h3>
+                <span class="chip">● ACTIVE</span>
+            </div>
+            <table class="setup-table">
+                <thead><tr><th>Position</th><th>Risk Size</th><th>Max Loss</th><th>Status</th></tr></thead>
+                <tbody>
+                    <tr><td class="coin">LTCUSDT</td><td>$170.00</td><td style="color:#ff5252;">-0.78%</td><td><span class="badge badge-green">✅ ACTIVE</span></td></tr>
+                    <tr><td class="coin">BTCUSDT</td><td>$200.00</td><td style="color:#ff5252;">-1.20%</td><td><span class="badge badge-gold">⏳ PENDING</span></td></tr>
+                    <tr><td class="coin">ETHUSDT</td><td>$150.00</td><td style="color:#ff5252;">-0.90%</td><td><span class="badge badge-gold">⏳ PENDING</span></td></tr>
+                </tbody>
+            </table>
+            <div style="margin-top:6px;font-size:0.6rem;color:#546e7a;">📌 Kelly Fraction: 0.00 · MTF: 🟡 BULLISH PARTIAL</div>
+        </div>
+
+        <!-- CARD: Key Levels BTC -->
+        <div class="card">
+            <div class="card-header"><h3>₿ BTC · KEY LEVELS</h3><span class="chip">LIVE</span></div>
+            <div class="level-row" style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="color:#78909c;">Resistance</span><span style="font-weight:500;color:#e8edf3;" id="btcResistance">$61,500</span></div>
+            <div class="level-row" style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="color:#78909c;">Current</span><span style="font-weight:500;color:#4fc3f7;" id="btcCurrent">$61,438</span></div>
+            <div class="level-row" style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="color:#78909c;">Support</span><span style="font-weight:500;color:#e8edf3;" id="btcSupport">$60,500</span></div>
+            <div class="level-row" style="display:flex;justify-content:space-between;padding:3px 0;"><span style="color:#78909c;">Daily Pool</span><span style="font-weight:500;color:#e8edf3;">$62,180 / $57,758</span></div>
+        </div>
+
+        <!-- CARD: Key Levels ETH -->
+        <div class="card">
+            <div class="card-header"><h3>⟠ ETH · KEY LEVELS</h3><span class="chip">LIVE</span></div>
+            <div class="level-row" style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="color:#78909c;">Resistance</span><span style="font-weight:500;color:#e8edf3;" id="ethResistance">$1,740</span></div>
+            <div class="level-row" style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="color:#78909c;">Current</span><span style="font-weight:500;color:#4fc3f7;" id="ethCurrent">$1,700</span></div>
+            <div class="level-row" style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="color:#78909c;">Support</span><span style="font-weight:500;color:#e8edf3;" id="ethSupport">$1,655</span></div>
+            <div class="level-row" style="display:flex;justify-content:space-between;padding:3px 0;"><span style="color:#78909c;">CVD</span><span style="font-weight:500;color:#00e676;">Bullish Divergence</span></div>
+        </div>
+
+        <!-- CARD: Active Trade LTC -->
+        <div class="card">
+            <div class="card-header"><h3>Ł LTC · ACTIVE TRADE</h3><span class="badge badge-green">● IN PLAY</span></div>
+            <div class="level-row" style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="color:#78909c;">Entry</span><span style="font-weight:500;color:#4fc3f7;" id="ltcEntry">$43.48</span></div>
+            <div class="level-row" style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="color:#78909c;">Stop</span><span style="font-weight:500;color:#ff5252;" id="ltcStop">$43.14</span></div>
+            <div class="level-row" style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="color:#78909c;">TP1</span><span style="font-weight:500;color:#00e676;" id="ltcTp1">$44.35</span></div>
+            <div class="level-row" style="display:flex;justify-content:space-between;padding:3px 0;"><span style="color:#78909c;">TP2</span><span style="font-weight:500;color:#00e676;" id="ltcTp2">$45.22</span></div>
+        </div>
+
+    </div> <!-- album-grid -->
+
+    <!-- ═══════════ STATUS BAR ═══════════ -->
+    <div class="status-bar">
+        <div class="left">
+            <span>🏞️ <strong>Trade Park Status:</strong></span>
+            <span><span class="dot dot-green"></span> 1 Active Trade (LTC) + 2 Pending</span>
+            <span><span class="dot dot-gold"></span> Best: LTCUSDT (2.6:1, 94%)</span>
+            <span><span class="dot dot-green"></span> Market: NEUTRAL · Volatility ↑</span>
+        </div>
+        <div class="right">⚡ SMC AI · REAL CVD · v2 · <span id="liveCoinCount">54</span> coins</div>
+    </div>
+
+    <div style="margin-top:12px;text-align:center;font-size:0.6rem;color:#37474f;border-top:1px solid rgba(255,255,255,0.03);padding-top:12px;">
+        🏞️ <em>"In a park, you watch the patterns before you trade them."</em> · Simulated data · Real Binance API requires backend proxy.
+    </div>
+
+</div>
+
+<script>
+    // ─────────────────────────────────────────────────────────────
+    //  FULL COIN LIST (54 unique, cleaned from user input)
+    // ─────────────────────────────────────────────────────────────
+    const ALL_COINS = [
+        'ICPUSDT', 'ATOMUSDT', 'KASUSDT', 'DOTUSDT', 'GALAUSDT',
+        'PYTHUSDT', 'XLMUSDT', 'SEIUSDT', 'MANAUSDT', 'JTOUSDT',
+        'CRVUSDT', 'SANDUSDT', 'ALGOUSDT', 'WIFUSDT', 'STXUSDT',
+        'ARBUSDT', 'INJUSDT', 'ONDOUSDT', 'TIAUSDT', 'DOGEUSDT',
+        'APTUSDT', 'STRKUSDT', 'ENAUSDT', 'ETHFIUSDT', 'EGLDUSDT',
+        'BNBUSDT', 'ZECUSDT', 'FLOWUSDT', 'OPUSDT', 'RUNEUSDT',
+        'BCHUSDT', 'FETUSDT', 'AVAXUSDT', 'LTCUSDT', 'NEARUSDT',
+        'RENDERUSDT', 'AXSUSDT', 'SUIUSDT', 'AAVEUSDT', 'XRPUSDT',
+        'ETHUSDT', 'UNIUSDT', 'VETUSDT', 'ADAUSDT', 'LINKUSDT',
+        'SOLUSDT', 'PENDLEUSDT', 'JUPUSDT', 'ZROUSDT', 'WLDUSDT',
+        'BTCUSDT'
+    ];
+
+    // ─────────────────────────────────────────────────────────────
+    //  SIMULATED DATA ENGINE
+    // ─────────────────────────────────────────────────────────────
+
+    // Tape speed history (initial)
+    let tapeHistory = [
+        { time: '23:41:02', speed: 81.7 },
+        { time: '23:41:06', speed: 64.1 },
+        { time: '23:41:08', speed: 65.0 },
+        { time: '23:41:35', speed: 4.2 },
+        { time: '23:41:36', speed: 189.8 },
+        { time: '23:41:56', speed: 106.5 },
+        { time: '23:41:56', speed: 143.4 },
+        { time: '23:41:57', speed: 150.0 },
+        { time: '23:42:04', speed: 50.8 },
+        { time: '23:42:17', speed: 41.3 },
+        { time: '23:42:24', speed: 69.3 },
+        { time: '23:42:54', speed: 105.1 },
+        { time: '23:42:57', speed: 107.1 },
+        { time: '23:43:00', speed: 71.0 },
+        { time: '23:43:02', speed: 73.0 },
+        { time: '23:43:02', speed: 73.7 },
+        { time: '23:43:42', speed: 53.2 },
+        { time: '23:43:44', speed: 194.7 },
+        { time: '23:43:48', speed: 196.8 },
+        { time: '23:44:10', speed: 58.3 },
+        { time: '23:44:30', speed: 61.2 },
+        { time: '23:44:30', speed: 60.2 },
+        { time: '23:44:36', speed: 44.6 },
+        { time: '23:44:46', speed: 80.6 },
+        { time: '23:44:48', speed: 79.6 },
+        { time: '23:44:52', speed: 31.4 },
+        { time: '23:44:52', speed: 32.2 },
+        { time: '23:45:00', speed: 36.0 },
+        { time: '23:45:00', speed: 36.7 },
+        { time: '23:45:01', speed: 39.2 },
+        { time: '23:45:02', speed: 39.9 },
+        { time: '23:45:04', speed: 45.6 },
+        { time: '23:45:30', speed: 252.4 },
+        { time: '23:45:34', speed: 109.0 },
+        { time: '23:46:10', speed: 91.1 },
+        { time: '23:46:34', speed: 63.1 },
+        { time: '23:46:36', speed: 95.0 },
+        { time: '23:46:38', speed: 89.9 },
+        { time: '23:46:44', speed: 54.8 },
+        { time: '23:46:45', speed: 55.4 },
+        { time: '23:46:46', speed: 55.5 },
+        { time: '23:47:06', speed: 78.9 },
+        { time: '23:47:06', speed: 82.0 },
+        { time: '23:47:08', speed: 85.0 },
+        { time: '23:47:08', speed: 89.6 },
+        { time: '23:47:14', speed: 104.0 },
+        { time: '23:47:16', speed: 151.2 },
+        { time: '23:47:23', speed: 103.8 },
+    ];
+
+    // Signal alerts (initial)
+    let signalAlerts = [
+        { time: '01:56:17', msg: 'Bearish CVD Divergence on SOLUSDT: price higher high, CVD lower high.', tag: 'CVD' },
+        { time: '01:56:30', msg: 'Bearish CVD Divergence on AVAXUSDT: price higher high, CVD lower high.', tag: 'CVD' },
+        { time: '01:56:41', msg: 'Bullish CVD Divergence on BTCUSDT: price lower low, CVD higher low. Accumulation.', tag: 'CVD' },
+        { time: '01:56:48', msg: 'Bullish CVD Divergence on BNBUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '01:57:03', msg: 'Bullish CVD Divergence on HBARUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '01:57:22', msg: 'Bearish CVD Divergence on WLDUSDT: price higher high, CVD lower high.', tag: 'CVD' },
+        { time: '01:58:06', msg: 'Bullish CVD Divergence on XRPUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '01:58:15', msg: 'Bullish CVD Divergence on AAVEUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '01:58:17', msg: 'Bearish CVD Divergence on JTOUSDT: price higher high, CVD lower high.', tag: 'CVD' },
+        { time: '01:58:23', msg: 'Bearish CVD Divergence on ZROUSDT: price higher high, CVD lower high.', tag: 'CVD' },
+        { time: '02:00:55', msg: 'Bullish CVD Divergence on ZECUSDT / DOGEUSDT / SOLUSDT.', tag: 'CVD' },
+        { time: '02:00:55', msg: 'Bearish CVD Divergence on HBARUSDT: price higher high, CVD lower high.', tag: 'CVD' },
+        { time: '02:00:56', msg: 'Bullish CVD Divergence on WLDUSDT / AVAXUSDT / BTCUSDT.', tag: 'CVD' },
+        { time: '02:00:56', msg: 'Bearish CVD Divergence on XLMUSDT: price higher high, CVD lower high.', tag: 'CVD' },
+        { time: '02:01:00', msg: 'Real CVD single stream connected for all 54 coins.', tag: 'INFO' },
+        { time: '02:01:51', msg: 'Bearish CVD Divergence on ETHUSDT: price higher high, CVD lower high.', tag: 'CVD' },
+        { time: '02:03:58', msg: 'Bullish CVD Divergence on BTCUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '02:03:59', msg: 'Bullish CVD Divergence on ZECUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '02:04:02', msg: 'Bearish CVD Divergence on HBARUSDT: price higher high, CVD lower high.', tag: 'CVD' },
+        { time: '02:04:04', msg: 'Bearish CVD Divergence on ADAUSDT: price higher high, CVD lower high.', tag: 'CVD' },
+        { time: '02:05:10', msg: 'Bearish CVD Divergence on ETHUSDT: price higher high, CVD lower high.', tag: 'CVD' },
+        { time: '02:05:23', msg: 'Bullish CVD Divergence on SOLUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '02:05:38', msg: 'Bearish CVD Divergence on BNBUSDT: price higher high, CVD lower high.', tag: 'CVD' },
+        { time: '02:11:31', msg: 'Multiple CVD divergences detected (ADA, HBAR, ZEC, SOL, XRP, ETH, WLD, AVAX).', tag: 'CVD' },
+        { time: '02:11:36', msg: 'Real CVD single stream connected for all 54 coins.', tag: 'INFO' },
+        { time: '02:14:30', msg: 'Bullish CVD Divergence on BTCUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '02:14:34', msg: 'Bullish CVD Divergence on HBARUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '02:14:45', msg: 'Bullish CVD Divergence on GALAUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '02:16:30', msg: 'Bullish CVD Divergence on ZECUSDT / ETHUSDT.', tag: 'CVD' },
+        { time: '02:16:34', msg: 'Real CVD single stream connected for all 54 coins.', tag: 'INFO' },
+        { time: '02:18:04', msg: 'Bullish CVD Divergence on BTCUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '02:18:05', msg: 'Bullish CVD Divergence on AVAXUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '02:19:01', msg: 'Bullish CVD Divergence on SOLUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '02:19:34', msg: 'Bullish CVD Divergence on ETHUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '02:20:28', msg: 'Bearish CVD Divergence on BNBUSDT: price higher high, CVD lower high.', tag: 'CVD' },
+        { time: '02:21:39', msg: 'Bullish CVD Divergence on ZROUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '02:21:42', msg: 'Bullish CVD Divergence on AAVEUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+        { time: '02:21:59', msg: 'Bullish CVD Divergence on WLDUSDT: price lower low, CVD higher low.', tag: 'CVD' },
+    ];
+
+    // ─── Helper ────────────────────────────────────────────────
+    function getDirection() {
+        const r = Math.random();
+        if (r < 0.33) return 'BUY';
+        if (r < 0.66) return 'SELL';
+        return 'NEUTRAL';
+    }
+
+    // ─── Update Clock ─────────────────────────────────────
+    function updateClock() {
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2,'0');
+        const mm = String(now.getMinutes()).padStart(2,'0');
+        const ss = String(now.getSeconds()).padStart(2,'0');
+        document.getElementById('clock').textContent = `⏱️ ${hh}:${mm}:${ss} UTC`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ─── Render Tape Alerts ──────────────────────────────
+    function renderTape() {
+        const container = document.getElementById('tapeAlerts');
+        const last10 = tapeHistory.slice(-10);
+        container.innerHTML = last10.map(item => `
+            <div class="alert-item">
+                <span class="time">[${item.time}]</span>
+                <span class="msg">⚡ TAPE SPEED ULTRA: ${item.speed.toFixed(1)}x avg. Aggressive market orders.</span>
+                <span class="tag tag-tape">TAPE</span>
+            </div>
+        `).join('');
+
+        const speeds = tapeHistory.map(d => d.speed);
+        const latest = speeds[speeds.length-1];
+        const high = Math.max(...speeds);
+        const low = Math.min(...speeds);
+        const avg = speeds.reduce((a,b) => a+b,0) / speeds.length;
+        document.getElementById('latestTape').textContent = latest.toFixed(1)+'x';
+        document.getElementById('highTape').textContent = high.toFixed(1)+'x';
+        document.getElementById('lowTape').textContent = low.toFixed(1)+'x';
+        document.getElementById('avgTape').textContent = avg.toFixed(1)+'x';
+        document.getElementById('latestTime').textContent = tapeHistory[tapeHistory.length-1].time;
+        const vol = (Math.random()*30 + 10).toFixed(1);
+        document.getElementById('volatilityMsg').textContent = `Expect volatility expansion (${vol}%) in next 15–30 min`;
+    }
+
+    // ─── Render Signal Alerts ─────────────────────────────
+    function renderSignals() {
+        const container = document.getElementById('signalAlerts');
+        const last15 = signalAlerts.slice(-15);
+        container.innerHTML = last15.map(item => `
+            <div class="alert-item">
+                <span class="time">[${item.time}]</span>
+                <span class="msg">${item.msg}</span>
+                <span class="tag ${item.tag === 'CVD' ? 'tag-cvd' : 'tag-info'}">${item.tag}</span>
+            </div>
+        `).join('');
+    }
+
+    // ─── Render Setups ────────────────────────────────────
+    function renderSetups() {
+        const bullish = [
+            { coin: 'LTCUSDT', entry: 43.48, target: '44.35 / 45.22', rr: '2.6:1', signal: '✅ FALLBACK BUY' },
+            { coin: 'BTCUSDT', entry: 61200, target: '62,800', rr: '2.1:1', signal: '🟢 CVD Div' },
+            { coin: 'ETHUSDT', entry: 1685, target: '1,740', rr: '2.0:1', signal: '🟢 Accumulation' },
+            { coin: 'SOLUSDT', entry: 79.50, target: '83.20', rr: '2.3:1', signal: '🔄 Reversal' },
+            { coin: 'AAVEUSDT', entry: 85.00, target: '90.50', rr: '2.8:1', signal: '🟢 CVD Bullish' },
+        ];
+        const bearish = [
+            { coin: 'WIFUSDT', entry: 0.18, target: '0.15', rr: '2.5:1', signal: '🔴 Candle Expansion' },
+            { coin: 'HBARUSDT', entry: 0.075, target: '0.065', rr: '2.3:1', signal: '🔴 Distribution' },
+            { coin: 'GALAUSDT', entry: 0.0045, target: '0.0040', rr: '2.1:1', signal: '🔴 Weak Momentum' },
+        ];
+
+        document.getElementById('bullishBody').innerHTML = bullish.map(b => `
+            <tr><td class="coin">${b.coin}</td><td>$${b.entry}</td><td>$${b.target}</td><td><span class="rr-badge">${b.rr}</span></td><td>${b.signal}</td></tr>
+        `).join('');
+
+        document.getElementById('bearishBody').innerHTML = bearish.map(b => `
+            <tr><td class="coin">${b.coin}</td><td>$${b.entry}</td><td>$${b.target}</td><td><span class="rr-badge">${b.rr}</span></td><td>${b.signal}</td></tr>
+        `).join('');
+    }
+
+    // ─── Render Top 5 Setups ─────────────────────────────
+    function renderTopSetups() {
+        const tops = [
+            { name: 'LTCUSDT', dir: 'BUY', conf: '94%', desc: 'Fallback Entry Active' },
+            { name: 'BTCUSDT', dir: 'BUY', conf: '89%', desc: 'Accumulation Divergence' },
+            { name: 'WIFUSDT', dir: 'SELL', conf: '87%', desc: 'High Volatility Expansion' },
+            { name: 'ZROUSDT', dir: 'BUY', conf: '85%', desc: 'Liquidity Sweep + CVD' },
+            { name: 'ETHUSDT', dir: 'BUY', conf: '82%', desc: 'Reversal from Lows' },
+        ];
+        const container = document.getElementById('topSetups');
+        container.innerHTML = tops.map(t => `
+            <div style="background:rgba(0,0,0,0.2);border-radius:12px;padding:8px 10px;border:1px solid rgba(255,255,255,0.03);">
+                <div style="font-size:0.5rem;color:#546e7a;">#${tops.indexOf(t)+1}</div>
+                <div style="font-weight:600;color:#e8edf3;">${t.name}</div>
+                <div><span class="badge ${t.dir === 'BUY' ? 'badge-green' : 'badge-red'}">${t.dir}</span> <span style="font-size:0.65rem;color:#78909c;">${t.conf}</span></div>
+                <div style="font-size:0.55rem;color:#546e7a;margin-top:2px;">${t.desc}</div>
+            </div>
+        `).join('');
+    }
+
+    // ─── Render Market Overview ───────────────────────────
+    function renderMarket() {
+        const alpha = (Math.random()*0.3 - 0.15).toFixed(2);
+        document.getElementById('btcAlpha').textContent = (alpha >= 0 ? '+' : '') + alpha + '%';
+        document.getElementById('btcAlphaSub').textContent = Math.random() > 0.5 ? 'Bullish' : 'Neutral';
+        document.getElementById('marketRegime').textContent = ['NEUTRAL','BULLISH','BEARISH'][Math.floor(Math.random()*3)];
+        document.getElementById('oiFlow').textContent = (Math.random()*0.2 - 0.1).toFixed(2) + '%';
+        document.getElementById('fundingRate').textContent = (Math.random()*0.02).toFixed(3) + '%';
+        document.getElementById('volDelta').textContent = (Math.random()*30 + 5).toFixed(2) + '%';
+        document.getElementById('cvdReal').textContent = (Math.random()*40 + 5).toFixed(2) + '%';
+
+        const spark = document.getElementById('btcSpark');
+        const vals = Array.from({length: 20}, () => Math.random()*100 + 50);
+        spark.innerHTML = vals.map(v => `<div class="bar ${v>70?'green':'red'}" style="height:${v*0.3}px;"></div>`).join('');
+    }
+
+    // ─── Render Full Scan Grid ────────────────────────────
+    function renderScanGridFull() {
+        const container = document.getElementById('scanGridFull');
+        // For each coin, assign a random direction (simulated)
+        const coinsWithDir = ALL_COINS.map(sym => ({ sym, dir: getDirection() }));
+        container.innerHTML = coinsWithDir.map(c => `
+            <div class="scan-item">
+                <span class="sym">${c.sym}</span>
+                <span class="dir" style="color: ${c.dir === 'BUY' ? '#00e676' : c.dir === 'SELL' ? '#ff5252' : '#78909c'};">
+                    ${c.dir === 'BUY' ? '▲ BUY' : c.dir === 'SELL' ? '▼ SELL' : '— NEUTRAL'}
+                </span>
+            </div>
+        `).join('');
+
+        // update stats
+        const bullish = coinsWithDir.filter(c => c.dir === 'BUY').length;
+        const bearish = coinsWithDir.filter(c => c.dir === 'SELL').length;
+        const neutral = coinsWithDir.filter(c => c.dir === 'NEUTRAL').length;
+        document.getElementById('scanStats').textContent = `↕ ${ALL_COINS.length} active · ${bullish} bullish · ${bearish} bearish · ${neutral} neutral`;
+        document.getElementById('scanCoinCount').textContent = `${ALL_COINS.length} coins`;
+        document.getElementById('liveCoinCount').textContent = ALL_COINS.length;
+    }
+
+    // ─── Render Portfolio ─────────────────────────────────
+    function renderPortfolio() {
+        const balance = 9830 + (Math.random()*20 - 10);
+        document.getElementById('balance').textContent = '$' + balance.toFixed(2);
+        const pnl = (Math.random()*5 - 2.5);
+        document.getElementById('floatingPnl').textContent = (pnl >= 0 ? '+' : '') + pnl.toFixed(2);
+        document.getElementById('winRate').textContent = (Math.random()*30 + 50).toFixed(0) + '%';
+        document.getElementById('totalTrades').textContent = Math.floor(Math.random()*20 + 5);
+        document.getElementById('wins').textContent = Math.floor(Math.random()*10 + 2);
+        document.getElementById('losses').textContent = Math.floor(Math.random()*8 + 1);
+        document.getElementById('maxDrawdown').textContent = (Math.random()*8 + 1).toFixed(1) + '%';
+    }
+
+    // ─── Update Key Levels ────────────────────────────────
+    function updateKeyLevels() {
+        const btc = 61438 + (Math.random()*200 - 100);
+        const eth = 1700 + (Math.random()*10 - 5);
+        const ltc = 43.48 + (Math.random()*0.4 - 0.2);
+        document.getElementById('btcCurrent').textContent = '$' + btc.toFixed(0);
+        document.getElementById('ethCurrent').textContent = '$' + eth.toFixed(0);
+        document.getElementById('ltcEntry').textContent = '$' + ltc.toFixed(2);
+        document.getElementById('btcResistance').textContent = '$' + (btc + 200).toFixed(0);
+        document.getElementById('btcSupport').textContent = '$' + (btc - 300).toFixed(0);
+        document.getElementById('ethResistance').textContent = '$' + (eth + 40).toFixed(0);
+        document.getElementById('ethSupport').textContent = '$' + (eth - 30).toFixed(0);
+    }
+
+    // ─── Main update ──────────────────────────────────────
+    function updateAll() {
+        renderTape();
+        renderSignals();
+        renderSetups();
+        renderTopSetups();
+        renderMarket();
+        renderScanGridFull();
+        renderPortfolio();
+        updateKeyLevels();
+    }
+
+    // Initial render
+    updateAll();
+
+    // Live feed every 2.5s
+    setInterval(() => {
+        const now = new Date();
+        const timeStr = String(now.getHours()).padStart(2,'0') + ':' +
+                        String(now.getMinutes()).padStart(2,'0') + ':' +
+                        String(now.getSeconds()).padStart(2,'0');
+        const speed = Math.random() * 200 + 10;
+        tapeHistory.push({ time: timeStr, speed: speed });
+        if (tapeHistory.length > 100) tapeHistory.shift();
+
+        if (Math.random() > 0.7) {
+            const msgs = [
+                'Bullish CVD Divergence on ' + ['BTC','ETH','SOL','XRP','ADA','LINK'][Math.floor(Math.random()*6)] + 'USDT: price lower low, CVD higher low.',
+                'Bearish CVD Divergence on ' + ['BNB','DOT','AVAX','MATIC'][Math.floor(Math.random()*4)] + 'USDT: price higher high, CVD lower high.',
+                'Real CVD single stream connected for all 54 coins.',
+            ];
+            signalAlerts.push({
+                time: timeStr,
+                msg: msgs[Math.floor(Math.random()*msgs.length)],
+                tag: Math.random() > 0.8 ? 'INFO' : 'CVD'
+            });
+            if (signalAlerts.length > 80) signalAlerts.shift();
+        }
+
+        updateAll();
+    }, 2500);
+
+    // ─── Button interactions ──────────────────────────────
+    document.getElementById('forceScanBtn').addEventListener('click', function() {
+        document.getElementById('albumGrid').classList.add('scanning');
+        this.textContent = '⟳ SCANNING...';
+        this.disabled = true;
+        setTimeout(() => {
+            document.getElementById('albumGrid').classList.remove('scanning');
+            this.textContent = '⟳ FORCE SCAN';
+            this.disabled = false;
+            updateAll();
+        }, 2000);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', function() {
+        document.getElementById('balance').textContent = '$9,830.00';
+        document.getElementById('floatingPnl').textContent = '+$0.00';
+        document.getElementById('realizedPnl').textContent = '+$0.00';
+        document.getElementById('winRate').textContent = '0%';
+        document.getElementById('totalTrades').textContent = '0';
+        document.getElementById('wins').textContent = '0';
+        document.getElementById('losses').textContent = '0';
+        document.getElementById('maxDrawdown').textContent = '0.0%';
+    });
+
+    console.log('🏞️ SMC AI Trade Park · 54 coins loaded (simulated)');
+    console.log('🔌 Replace simulation with real Binance WebSocket for live data.');
+</script>
+
+</body>
+</html>
